@@ -1,0 +1,608 @@
+--[[ 
+    Script feito por S1lvax 
+    (Use apenas para fins educativos e testes!)
+]]
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Função animada para troca ON/OFF
+local function animateToggle(btn, isOn)
+    local onColor = Color3.fromRGB(0, 255, 128)
+    local offColor = Color3.fromRGB(255,255,255)
+    TweenService:Create(btn, TweenInfo.new(0.12, Enum.EasingStyle.Quad), {TextTransparency=1, TextColor3 = isOn and onColor or offColor}):Play()
+    task.wait(0.13)
+    btn.Text = btn.BaseText .. (isOn and "ON" or "OFF")
+    TweenService:Create(btn, TweenInfo.new(0.17, Enum.EasingStyle.Quad), {TextTransparency=0}):Play()
+end
+
+-- Remove GUIs duplicadas
+pcall(function()
+    for _, gui in ipairs(LocalPlayer.PlayerGui:GetChildren()) do
+        if gui.Name == "ScriptS" or gui.Name == "CreditosScript" or gui.Name == "TPZadoLabel" then
+            gui:Destroy()
+        end
+    end
+end)
+
+-- Mensagem de crédito animada
+local msgGui = Instance.new("ScreenGui")
+msgGui.Name = "CreditosScript"
+msgGui.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+local msgFrame = Instance.new("Frame")
+msgFrame.Parent = msgGui
+msgFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+msgFrame.Size = UDim2.new(0, 270, 0, 40)
+msgFrame.Position = UDim2.new(1, -290, 0, 100)
+msgFrame.AnchorPoint = Vector2.new(0, 0)
+msgFrame.BackgroundTransparency = 1
+msgFrame.BorderSizePixel = 0
+local msgCorner = Instance.new("UICorner", msgFrame)
+msgCorner.CornerRadius = UDim.new(0.5,0)
+local msgLabel = Instance.new("TextLabel", msgFrame)
+msgLabel.BackgroundTransparency = 1
+msgLabel.Size = UDim2.new(1, 0, 1, 0)
+msgLabel.Position = UDim2.new(0, 0, 0, 0)
+msgLabel.Text = "script feito por S1lvax"
+msgLabel.Font = Enum.Font.FredokaOne
+msgLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+msgLabel.TextScaled = true
+msgLabel.TextTransparency = 1
+
+TweenService:Create(msgFrame, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(1, -290, 0, 60), BackgroundTransparency = 0.2}):Play()
+TweenService:Create(msgLabel, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+task.wait(5)
+local outTween = TweenService:Create(msgFrame, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, -290, 0, 140), BackgroundTransparency = 1})
+local outTween2 = TweenService:Create(msgLabel, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1})
+outTween:Play() outTween2:Play()
+outTween.Completed:Wait()
+msgGui:Destroy()
+
+-- Função arrastar
+local function makeDraggable(frame)
+    local dragging, dragInput, dragStart, startPos
+    frame.Active = true
+    frame.Selectable = true
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+-- TPZADO LABEL (no topo da tela)
+local function tpzadoTween()
+    local tpzGui = Instance.new("ScreenGui")
+    tpzGui.Name = "TPZadoLabel"
+    tpzGui.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+    local tpzLabel = Instance.new("TextLabel", tpzGui)
+    tpzLabel.Text = "tpzado!"
+    tpzLabel.Font = Enum.Font.FredokaOne
+    tpzLabel.TextColor3 = Color3.new(1,1,1)
+    tpzLabel.TextStrokeTransparency = 0.7
+    tpzLabel.BackgroundTransparency = 1
+    tpzLabel.Size = UDim2.new(1,0,0,60)
+    tpzLabel.Position = UDim2.new(0,0,0,0)
+    tpzLabel.TextScaled = true
+    tpzLabel.TextTransparency = 1
+
+    TweenService:Create(tpzLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+    task.wait(1.1)
+    TweenService:Create(tpzLabel, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
+    task.wait(0.8)
+    tpzGui:Destroy()
+end
+
+-- GUI PRINCIPAL
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ScriptS"
+screenGui.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+
+local iconBtn = Instance.new("ImageButton")
+iconBtn.Size = UDim2.new(0, 56, 0, 56)
+iconBtn.Position = UDim2.new(0, 60, 0, 60)
+iconBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+iconBtn.Image = ""
+iconBtn.BorderSizePixel = 0
+iconBtn.AutoButtonColor = false
+iconBtn.BackgroundTransparency = 0.1
+iconBtn.ClipsDescendants = true
+iconBtn.ZIndex = 2
+iconBtn.AnchorPoint = Vector2.new(0.5, 0.5)
+iconBtn.SizeConstraint = Enum.SizeConstraint.RelativeXY
+iconBtn.Name = "MovableIcon"
+iconBtn.Parent = screenGui
+local iconUICorner = Instance.new("UICorner", iconBtn)
+iconUICorner.CornerRadius = UDim.new(1, 0)
+local iconLabel = Instance.new("TextLabel", iconBtn)
+iconLabel.Text = "S"
+iconLabel.Size = UDim2.new(1,0,1,0)
+iconLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+iconLabel.BackgroundTransparency = 1
+iconLabel.Font = Enum.Font.FredokaOne
+iconLabel.TextScaled = true
+iconLabel.ZIndex = 3
+makeDraggable(iconBtn)
+
+-- Painel
+local normalSize = UDim2.new(0, 320, 0, 420)
+local expandedSize = UDim2.new(0, 440, 0, 600)
+local isExpanded = false
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = normalSize
+mainFrame.Position = UDim2.new(0, 150, 0, 120)
+mainFrame.BackgroundColor3 = Color3.fromRGB(28, 30, 36)
+mainFrame.Visible = false
+mainFrame.BackgroundTransparency = 0
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Name = "MovablePanel"
+mainFrame.ZIndex = 100
+mainFrame.Parent = screenGui
+local frameCorner = Instance.new("UICorner", mainFrame)
+frameCorner.CornerRadius = UDim.new(0.15, 0)
+local shadow = Instance.new("ImageLabel", mainFrame)
+shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+shadow.Position = UDim2.new(0.5,0,0.5,0)
+shadow.Size = UDim2.new(1,20,1,20)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageTransparency = 0.6
+shadow.ZIndex = 0
+makeDraggable(mainFrame)
+
+local title = Instance.new("TextLabel")
+title.Text = "Painel de Funcionalidades"
+title.Size = UDim2.new(1,0,0,40)
+title.Position = UDim2.new(0,0,0,0)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.FredokaOne
+title.TextScaled = true
+title.ZIndex = 3
+title.Parent = mainFrame
+
+local expandBtn = Instance.new("TextButton", mainFrame)
+expandBtn.Size = UDim2.new(0, 30, 0, 30)
+expandBtn.Position = UDim2.new(1, -35, 0, 5)
+expandBtn.BackgroundTransparency = 1
+expandBtn.Text = "☐"
+expandBtn.TextColor3 = Color3.new(1,1,1)
+expandBtn.Font = Enum.Font.GothamBold
+expandBtn.TextScaled = true
+expandBtn.BorderSizePixel = 0
+expandBtn.ZIndex = 4
+
+-- SCROLLINGFRAME ajustado para sempre caber os botões
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Position = UDim2.new(0, 0, 0, 40)
+scrollFrame.Size = UDim2.new(1, 0, 1, -40)
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 2000)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 8
+scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(180,180,180)
+scrollFrame.ZIndex = 3
+scrollFrame.Parent = mainFrame
+
+-- Função para criar botões com borda branca fina, sem fundo
+local allBtns = {}
+local function addButton(text, idx)
+    local btn = Instance.new("TextButton")
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    btn.BackgroundTransparency = 1
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamBold
+    btn.ZIndex = 3
+    btn.AutoButtonColor = true
+    btn.BorderSizePixel = 0
+
+    -- Borda branca fina
+    local border = Instance.new("Frame", btn)
+    border.Name = "Border"
+    border.BackgroundTransparency = 1
+    border.Size = UDim2.new(1,0,1,0)
+    border.Position = UDim2.new(0,0,0,0)
+    border.ZIndex = 4
+    border.BorderSizePixel = 0
+
+    local borderLine = Instance.new("UIStroke", border)
+    borderLine.Thickness = 1
+    borderLine.Color = Color3.new(1,1,1)
+    borderLine.Transparency = 0
+
+    btn.Parent = scrollFrame
+    table.insert(allBtns, btn)
+    return btn, border
+end
+
+local function addLabel(text, idx)
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1,1,1)
+    label.TextScaled = true
+    label.Font = Enum.Font.FredokaOne
+    label.ZIndex = 3
+    label.Parent = scrollFrame
+    return label
+end
+
+local allLabels = {}
+allLabels[1] = addLabel("Velocidade")
+local speedBox = Instance.new("TextBox")
+speedBox.Text = "16"
+speedBox.BackgroundTransparency = 0.6
+speedBox.BackgroundColor3 = Color3.fromRGB(45,45,45)
+speedBox.TextColor3 = Color3.new(1,1,1)
+speedBox.TextScaled = true
+speedBox.Font = Enum.Font.GothamBold
+speedBox.ClearTextOnFocus = false
+speedBox.ZIndex = 3
+speedBox.Parent = scrollFrame
+allBtns[1] = addButton("Aplicar", 1)
+
+allLabels[2] = addLabel("Altura do Pulo")
+local jumpBox = Instance.new("TextBox")
+jumpBox.Text = "50"
+jumpBox.BackgroundTransparency = 0.6
+jumpBox.BackgroundColor3 = Color3.fromRGB(45,45,45)
+jumpBox.TextColor3 = Color3.new(1,1,1)
+jumpBox.TextScaled = true
+jumpBox.Font = Enum.Font.GothamBold
+jumpBox.ClearTextOnFocus = false
+jumpBox.ZIndex = 3
+jumpBox.Parent = scrollFrame
+allBtns[2] = addButton("Aplicar", 2)
+
+allBtns[3] = addButton("Noclip: OFF", 3)
+allBtns[3].BaseText = "Noclip: "
+local noclipActive, conn = false, nil
+allBtns[3].MouseButton1Click:Connect(function()
+    noclipActive = not noclipActive
+    animateToggle(allBtns[3], noclipActive)
+    if noclipActive then
+        conn = RunService.Stepped:Connect(function()
+            pcall(function() LocalPlayer.Character.Humanoid:ChangeState(11) end)
+        end)
+    else
+        if conn then conn:Disconnect() end
+        pcall(function() LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp) end)
+    end
+end)
+
+allBtns[4] = addButton("ESP: OFF", 4)
+allBtns[4].BaseText = "ESP: "
+local espActive = false
+allBtns[4].MouseButton1Click:Connect(function()
+    espActive = not espActive
+    animateToggle(allBtns[4], espActive)
+    if espActive then
+        for _,plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character then
+                for _,part in pairs(plr.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Color = Color3.fromRGB(200,0,255)
+                        part.Material = Enum.Material.Neon
+                    end
+                end
+            end
+        end
+    else
+        for _,plr in pairs(Players:GetPlayers()) do
+            if plr.Character then
+                for _,part in pairs(plr.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Color = part.BrickColor.Color
+                        part.Material = Enum.Material.Plastic
+                    end
+                end
+            end
+        end
+    end
+end)
+
+allBtns[5] = addButton("Invisível: OFF", 5)
+allBtns[5].BaseText = "Invisível: "
+local invisible = false
+allBtns[5].MouseButton1Click:Connect(function()
+    invisible = not invisible
+    animateToggle(allBtns[5], invisible)
+    local char = LocalPlayer.Character
+    if char then
+        for _,part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("Decal") then
+                part.Transparency = invisible and 1 or 0
+            elseif part:IsA("ParticleEmitter") or part:IsA("Trail") then
+                part.Enabled = not invisible
+            end
+        end
+        local hum = char:FindFirstChildWhichIsA("Humanoid")
+        if hum then
+            hum.NameDisplayDistance = invisible and 0 or 100
+            hum.HealthDisplayDistance = invisible and 0 or 100
+        end
+    end
+end)
+
+allBtns[6] = addButton("Matar Jogador Mais Próximo", 6)
+allBtns[6].MouseButton1Click:Connect(function()
+    local myChar = LocalPlayer.Character
+    if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
+    local closest, dist = nil, math.huge
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChildWhichIsA("Humanoid") then
+            local d = (plr.Character.HumanoidRootPart.Position - myChar.HumanoidRootPart.Position).Magnitude
+            if d < dist then dist = d closest = plr end
+        end
+    end
+    if closest and closest.Character and closest.Character:FindFirstChildWhichIsA("Humanoid") then
+        closest.Character:FindFirstChildWhichIsA("Humanoid").Health = 0
+    end
+end)
+
+allBtns[7] = addButton("Espada Laser Roxa", 7)
+allBtns[7].MouseButton1Click:Connect(function()
+    if LocalPlayer.Backpack:FindFirstChild("Espada Roxa") or (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Espada Roxa")) then return end
+    local sword = Instance.new("Tool")
+    sword.Name = "Espada Roxa"
+    sword.RequiresHandle = true
+    sword.CanBeDropped = true
+
+    local handle = Instance.new("Part")
+    handle.Name = "Handle"
+    handle.Size = Vector3.new(0.5, 4, 0.5)
+    handle.Color = Color3.fromRGB(200,0,255)
+    handle.Material = Enum.Material.Neon
+    handle.TopSurface = Enum.SurfaceType.Smooth
+    handle.BottomSurface = Enum.SurfaceType.Smooth
+    handle.Parent = sword
+
+    local blade = Instance.new("Part")
+    blade.Name = "Blade"
+    blade.Size = Vector3.new(0.35,3,0.35)
+    blade.Position = handle.Position + Vector3.new(0,3.5,0)
+    blade.Color = Color3.fromRGB(200,0,255)
+    blade.Material = Enum.Material.Neon
+    blade.Anchored = false
+    blade.CanCollide = false
+    blade.Parent = sword
+    blade.Massless = true
+    local weld = Instance.new("WeldConstraint", handle)
+    weld.Part0 = handle
+    weld.Part1 = blade
+    blade.CFrame = handle.CFrame * CFrame.new(0,1.5,0)
+
+    local guard = Instance.new("Part")
+    guard.Name = "Guard"
+    guard.Size = Vector3.new(1,0.2,1)
+    guard.Color = Color3.new(1,1,1)
+    guard.Material = Enum.Material.Metal
+    guard.Anchored = false
+    guard.CanCollide = false
+    guard.Parent = sword
+    guard.Massless = true
+    local weld2 = Instance.new("WeldConstraint", handle)
+    weld2.Part0 = handle
+    weld2.Part1 = guard
+    guard.CFrame = handle.CFrame * CFrame.new(0,-1.7,0)
+
+    sword.GripPos = Vector3.new(0, -1.5, 0)
+    sword.Parent = LocalPlayer.Backpack
+
+    local swordScript = Instance.new("LocalScript")
+    swordScript.Source = [[
+        local Tool = script.Parent
+        local UIS = game:GetService("UserInputService")
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        local mouse = LocalPlayer:GetMouse()
+        local equipped = false
+
+        Tool.Equipped:Connect(function()
+            equipped = true
+        end)
+        Tool.Unequipped:Connect(function()
+            equipped = false
+        end)
+
+        mouse.Button1Down:Connect(function()
+            if not equipped or Tool.Parent ~= LocalPlayer.Character then return end
+            local origin = Tool.Handle.Position
+            local dir = (mouse.Hit.p - origin).Unit
+            local ray = Ray.new(origin, dir * 1000)
+            local part, pos = workspace:FindPartOnRay(ray, LocalPlayer.Character, false, true)
+            local laser = Instance.new("Part", workspace)
+            laser.Anchored = true
+            laser.CanCollide = false
+            laser.Material = Enum.Material.Neon
+            laser.Color = Color3.fromRGB(200,0,255)
+            laser.Size = Vector3.new(0.18, 0.18, (pos-origin).Magnitude)
+            laser.CFrame = CFrame.new(origin, pos) * CFrame.new(0, 0, -laser.Size.Z/2)
+            laser.Transparency = 0.25
+
+            local TweenService = game:GetService("TweenService")
+            TweenService:Create(laser, TweenInfo.new(0.25), {Transparency=0.8}):Play()
+            game:GetService("Debris"):AddItem(laser, 0.35)
+
+            local snd = Instance.new("Sound", Tool.Handle)
+            snd.SoundId = "rbxassetid://12222225"
+            snd.Volume = 1
+            snd:Play()
+            game:GetService("Debris"):AddItem(snd, 1)
+
+            if part and part.Parent then
+                local hum = part.Parent:FindFirstChildWhichIsA("Humanoid")
+                if hum and hum ~= LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+                    hum.Health = 0
+                end
+            end
+        end)
+    ]]
+    swordScript.Parent = sword
+end)
+
+allBtns[8] = addButton("Teleporte: OFF", 8)
+allBtns[8].BaseText = "Teleporte: "
+local teleporting = false
+local mouseConn = nil
+
+local function showTeleportBall(tpPos)
+    local ball = Instance.new("Part")
+    ball.Shape = Enum.PartType.Ball
+    ball.Size = Vector3.new(3,3,3)
+    ball.Anchored = true
+    ball.CanCollide = false
+    ball.Color = Color3.new(1,1,1)
+    ball.Material = Enum.Material.Neon
+    ball.Position = tpPos + Vector3.new(0,1.5,0)
+    ball.Parent = workspace
+    ball.Transparency = 1
+    TweenService:Create(ball, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {Transparency = 0.1}):Play()
+    task.wait(0.8)
+    TweenService:Create(ball, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {Transparency = 1}):Play()
+    task.wait(0.7)
+    ball:Destroy()
+end
+
+allBtns[8].MouseButton1Click:Connect(function()
+    teleporting = not teleporting
+    animateToggle(allBtns[8], teleporting)
+    if teleporting then
+        local mouse = LocalPlayer:GetMouse()
+        mouseConn = mouse.Button1Down:Connect(function()
+            local pos = mouse.Hit and mouse.Hit.p
+            if pos then
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    char.HumanoidRootPart.CFrame = CFrame.new(pos + Vector3.new(0,3,0))
+                    spawn(function() showTeleportBall(pos) end)
+                    spawn(tpzadoTween)
+                end
+            end
+        end)
+    else
+        if mouseConn then
+            mouseConn:Disconnect()
+            mouseConn = nil
+        end
+    end
+end)
+
+allBtns[9] = addButton("Pulo Infinito: OFF", 9)
+allBtns[9].BaseText = "Pulo Infinito: "
+local infJumpActive = false
+local infJumpConn = nil
+allBtns[9].MouseButton1Click:Connect(function()
+    infJumpActive = not infJumpActive
+    animateToggle(allBtns[9], infJumpActive)
+    if infJumpActive then
+        if infJumpConn then infJumpConn:Disconnect() end
+        infJumpConn = UIS.JumpRequest:Connect(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChildWhichIsA("Humanoid") then
+                char:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    else
+        if infJumpConn then infJumpConn:Disconnect() infJumpConn = nil end
+    end
+end)
+
+local function layoutPanel()
+    local w = mainFrame.AbsoluteSize.X
+    local btnW, btnH = w - 60, 36
+    if isExpanded then btnH = 56 end
+    local y = 16
+
+    allLabels[1].Position = UDim2.new(0,30,0,y)
+    allLabels[1].Size = UDim2.new(0, 120, 0, btnH-10)
+    speedBox.Position = UDim2.new(0, 160, 0, y)
+    speedBox.Size = UDim2.new(0, 60, 0, btnH-10)
+    allBtns[1].Position = UDim2.new(0, 230, 0, y)
+    allBtns[1].Size = UDim2.new(0, btnW-200, 0, btnH-10)
+    y = y + btnH+4
+
+    allLabels[2].Position = UDim2.new(0,30,0,y)
+        allLabels[2].Size = UDim2.new(0, 120, 0, btnH-10)
+    jumpBox.Position = UDim2.new(0, 160, 0, y)
+    jumpBox.Size = UDim2.new(0, 60, 0, btnH-10)
+    allBtns[2].Position = UDim2.new(0, 230, 0, y)
+    allBtns[2].Size = UDim2.new(0, btnW-200, 0, btnH-10)
+    y = y + btnH+4
+
+    for i=3,#allBtns do
+        allBtns[i].Position = UDim2.new(0, 30, 0, y)
+        allBtns[i].Size = UDim2.new(0, btnW, 0, btnH)
+        local b = allBtns[i]:FindFirstChild("Border")
+        if b and b:FindFirstChildOfClass("UIStroke") then
+            b:FindFirstChildOfClass("UIStroke").Thickness = 1
+        end
+        b.Size = UDim2.new(1,0,1,0)
+        y = y + btnH + 4
+    end
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, y + 20)
+end
+
+expandBtn.MouseButton1Click:Connect(function()
+    isExpanded = not isExpanded
+    local targetMain = isExpanded and expandedSize or normalSize
+    expandBtn.Text = isExpanded and "-" or "☐"
+    TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = targetMain}):Play()
+    task.wait(0.05)
+    layoutPanel()
+end)
+mainFrame:GetPropertyChangedSignal("Size"):Connect(layoutPanel)
+layoutPanel()
+
+allBtns[1].MouseButton1Click:Connect(function()
+    local val = tonumber(speedBox.Text)
+    if val then LocalPlayer.Character.Humanoid.WalkSpeed = val end
+end)
+allBtns[2].MouseButton1Click:Connect(function()
+    local val = tonumber(jumpBox.Text)
+    if val then LocalPlayer.Character.Humanoid.JumpPower = val end
+end)
+
+-- PAINEL ABRE/FECHA COM CLIQUE NO S, COM TWEEN SUAVE
+iconBtn.MouseButton1Click:Connect(function()
+    if not mainFrame.Visible then
+        mainFrame.Visible = true
+        mainFrame.Position = UDim2.new(0, 150, 0, 120)
+        mainFrame.BackgroundTransparency = 1
+        TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+    else
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
+        tween:Play()
+        tween.Completed:Wait()
+        mainFrame.Visible = false
+        mainFrame.BackgroundTransparency = 0
+    end
+end)
+
+UIS.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.Escape then
+        mainFrame.Visible = false
+    end
+end)
